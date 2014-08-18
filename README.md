@@ -9,7 +9,7 @@ It requires a javascript code injector like Greasemonkey for Firefox or Tampermo
 
 As this is an experimental library, it may be unstable and buggy, so if you find any issue with it please provide feedback in order to improve it.
 
-This library uses [jsgif](https://github.com/antimatter15/jsgif) for GIF encoding. So actually the real job I made was only extracting the info from pixiv to feed the encoder with it and dinamically adding elements to the pixiv UI.
+This library uses [jsgif](https://github.com/antimatter15/jsgif) for GIF encoding. So actually the real job I made was only to extract the info from pixiv to feed the encoder with it to add dinamically elements in the pixiv UI.
 
 I want to thank to the creators of jsgif for they effort, which made possible this library.
 
