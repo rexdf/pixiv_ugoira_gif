@@ -15,7 +15,7 @@ I want to thank to the creators of jsgif for they effort, which made possible th
 
 USAGE
 
-All you've got to do is add the script to the disired javascript injector and that's it! If you use Greasemonkey/Tampermonkey, the script will only run when navigating pixiv.com or pixiv.net. You're gonna see the "Create GIF!" button the moment all frames of the animation are loaded. Once you click that button, the animation is processed frame by frame without the need of server-side scripts at all. The resulting GIF is shown in a layer over the UI, where you can use the common browser options for save it.
+All you've got to do is add the "pixiv_ugoira_gif.js" to the disired javascript injector and that's it! If you use Greasemonkey/Tampermonkey, the script will only run when navigating pixiv.com or pixiv.net. You're gonna see the "Create GIF!" button the moment all frames of the animation are loaded. Once you click that button, the animation is processed frame by frame without the need of server-side scripts at all. The resulting GIF is shown in a layer over the UI, where you can use the common browser options for save it.
 
 Warning: This library may cause significant performance issues in your browser when is used to convert large animations (length and/or size). Sometimes the browser stops a little, but in the end the resulting GIF is shown, so please BE PATIENT!
 
