@@ -19,4 +19,6 @@ All you've got to do is add the script to the disired javascript injector and th
 
 Warning: This library may cause significant performance issues in your browser when is used to convert large animations (length and/or size). Sometimes the browser stops a little, but in the end the resulting GIF is shown, so please BE PATIENT!
 
+Note: In Chrome it may be needed to add the ".gif" extension when saving.
+
 This library comes with NO WARRANTY at all so USE IT AT YOUR OWN RISK.
