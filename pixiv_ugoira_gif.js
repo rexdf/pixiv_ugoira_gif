@@ -1602,11 +1602,11 @@ var addScript = function(src){
 	head.appendChild(newScript);
 };
 
-var resizeBlock = function(){
+var resizeImageLayer = function(){
 	block
 		.offset({
-			top: 0,
-			left: 0
+			top: $(window).scrollTop(),
+			left: $(window).scrollLeft()
 		})
 		.width($(window).width())
 		.height($(window).height())
@@ -1617,8 +1617,8 @@ var resizeBlock = function(){
 				
 				thisImage
 					.offset({
-						left: ($(window).width() - thisImage.width()) / 2,
-						top: ($(window).height() - thisImage.height()) / 2
+						left: $(window).scrollTop() + (($(window).width() - thisImage.width()) / 2),
+						top: $(window).scrollLeft() + (($(window).height() - thisImage.height()) / 2)
 					});
 				
 				closeButton
@@ -1629,7 +1629,7 @@ var resizeBlock = function(){
 			});
 };
 
-$(window).on('resize', resizeBlock);
+$(window).on('resize', resizeImageLayer);
 
 var timeout = 0;
 var interval = setInterval(function(){
@@ -1663,7 +1663,7 @@ var pixivUgoiraGIF = function(){
 		if(button.length == 0){
 			button = $('<button>');
 			button
-				.appendTo(parent)
+				.appendTo(animationCanvas.parent())
 				.css({
 					position: 'absolute',
 					border: '1px solid #CFCFCF',
@@ -1697,6 +1697,8 @@ var pixivUgoiraGIF = function(){
 						.text('Creating GIF. Wait...')
 						.data('initial-text', thisButton.text());
 				}
+				
+				return false;
 			});
 	
 		encoder.setRepeat(0);
@@ -1722,12 +1724,15 @@ var pixivUgoiraGIF = function(){
 	            	}
 	            }
             	
-        		var createBlock = function(){
+        		var createImageLayer = function(){
 	            	block = $('<div>')
 	            		.css({
 	            			position: 'fixed',
 	            			zIndex: 20000,
 	            			backgroundColor: 'rgba(0, 0, 0, 0.75)'
+	            		})
+	            		.on('click', function(){
+	            			block.remove();
 	            		})
 	            		.appendTo(parent);
 	            		            	
@@ -1749,7 +1754,7 @@ var pixivUgoiraGIF = function(){
 	            		})
 	            		.appendTo(block);
 	            	
-	            	resizeBlock();
+	            	resizeImageLayer();
         		}
 	            
 	            if (!n) return this._debugLog("Image not available!"), void this._setLoadingState(0);
@@ -1771,10 +1776,12 @@ var pixivUgoiraGIF = function(){
 		        			.prop('disabled', false)
 		        			.off('click')
 		        			.on('click', function(){
-		        				createBlock.call(self);
+		        				createImageLayer.call(self);
+		        				
+		        				return false;
 		        			});
 		            	
-		            	createBlock.call(self);
+		            	createImageLayer.call(self);
 		        	}
 	        	}
 	            
