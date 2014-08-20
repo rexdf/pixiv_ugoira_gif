@@ -1706,7 +1706,7 @@ var pixivUgoiraGIF = function(){
 		if(button.length == 0){
 			button = $('<button>');
 			button
-				.appendTo(animationCanvas.parent())
+				.appendTo('body')
 				.css({
 					position: 'absolute',
 					border: '1px solid #CFCFCF',
