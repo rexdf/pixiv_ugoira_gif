@@ -1556,6 +1556,41 @@ function encode64(input) {
 
 //*******//
 
+(function($){
+	$.fn.closestCSSValue = function(property, value, different, returnValue){
+		var self = $(this).first();
+		var closestElement = $();
+		var closestValue = null;
+		
+		if(typeof different != 'boolean'){
+			different = false;
+		}
+		
+		if(typeof returnValue != 'boolean'){
+			returnValue = false;
+		}
+		
+		if($.type(property) == 'string' && $.type(value) == 'string'){
+			self.parents().each(function(){
+				var currentParent = $(this);
+				
+				if((currentParent.css(property) == value && ! different) || (currentParent.css(property) != value && different)){
+					closestElement = currentParent;
+					closestValue = currentParent.css(property);
+					
+					return false;
+				}
+			});
+		}
+		
+		if(returnValue){
+			return closestValue;
+		}else{
+			return closestElement;
+		}
+	}
+})(jQuery);
+
 if(typeof $ == 'undefined'){
 	window.onload = function(){		
 		addScript('http://code.jquery.com/jquery-1.11.0.min.js');
@@ -1569,7 +1604,6 @@ var framesReady;
 var frames;
 var dataURL;
 var button = $();
-var parent;
 var animationCanvas;
 var ugoiraData;
 var block;
@@ -1583,7 +1617,6 @@ var reset = function(){
 	frames = [];
 	dataURL = null;
 	//button = $();
-	parent = $('body');
 	animationCanvas = $();
 	ugoiraData = {};
 	block = $();
@@ -1603,10 +1636,20 @@ var addScript = function(src){
 };
 
 var resizeImageLayer = function(){
+	var closestElementWithScroll = animationCanvas.closestCSSValue('overflow-y', 'scroll');
+	var parent = $('body');
+	
+	if(closestElementWithScroll.length > 0){
+		parent = closestElementWithScroll;
+	}
+
+	var scrollTop = parent.scrollTop();
+	var scrollLeft = parent.scrollLeft();
+	
 	block
 		.offset({
-			top: $(window).scrollTop(),
-			left: $(window).scrollLeft()
+			top: scrollTop,
+			left: scrollLeft
 		})
 		.width($(window).width())
 		.height($(window).height())
@@ -1617,8 +1660,8 @@ var resizeImageLayer = function(){
 				
 				thisImage
 					.offset({
-						left: $(window).scrollTop() + (($(window).width() - thisImage.width()) / 2),
-						top: $(window).scrollLeft() + (($(window).height() - thisImage.height()) / 2)
+						left: block.offset().left + ((block.width() - thisImage.width()) / 2),
+						top: block.offset().top + ((block.height() - thisImage.height()) / 2)
 					});
 				
 				closeButton
@@ -1734,11 +1777,14 @@ var pixivUgoiraGIF = function(){
 	            		.on('click', function(){
 	            			block.remove();
 	            		})
-	            		.appendTo(parent);
+	            		.appendTo('body');
 	            		            	
 	            	$('<img src="' + dataURL + '" />')
             			.width(this._context.canvas.width)
             			.height(this._context.canvas.height)
+            			.css({
+            				position: 'absolute'
+            			})
 	            		.appendTo(block);
 
 	            	$('<button>Close</button>')
