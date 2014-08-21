@@ -1603,11 +1603,15 @@ var encodingDone;
 var framesReady;
 var frames;
 var dataURL;
-var button = $();
+var actionBar = $();
+var createButton = $();
+var downloadButton = $();
+var downloadGIFButton = $();
 var animationCanvas;
 var ugoiraData;
 var block;
 var player;
+var fileName;
 
 var reset = function(){
 	encoder = new GIFEncoder();
@@ -1616,11 +1620,11 @@ var reset = function(){
 	framesReady = false;
 	frames = [];
 	dataURL = null;
-	//button = $();
 	animationCanvas = $();
 	ugoiraData = {};
 	block = $();
 	player = null;
+	fileName = '';
 }
 
 reset();
@@ -1636,27 +1640,30 @@ var addScript = function(src){
 };
 
 var resizeImageLayer = function(){
-	var closestElementWithScroll = animationCanvas.closestCSSValue('overflow-y', 'scroll');
+	var closestElementWithScroll = animationCanvas.closestCSSValue('overflow', 'auto');
+	var closestElementWithScrollY = animationCanvas.closestCSSValue('overflow-y', 'scroll');
 	var parent = $('body');
 	
 	if(closestElementWithScroll.length > 0){
 		parent = closestElementWithScroll;
+	}else if(closestElementWithScrollY.length > 0){
+		parent = closestElementWithScrollY;
 	}
 
-	var scrollTop = parent.scrollTop();
-	var scrollLeft = parent.scrollLeft();
+	var positionTop = parent.offset().top + parent.scrollTop();
+	var positionLeft =parent.offset().left +  parent.scrollLeft();
 	
 	block
 		.offset({
-			top: scrollTop,
-			left: scrollLeft
+			top: positionTop,
+			left: positionLeft
 		})
 		.width($(window).width())
 		.height($(window).height())
 		.find('img')
 			.each(function(){
 				var thisImage = $(this);
-				var closeButton = thisImage.siblings('button');
+				var imgLayerActionBar = thisImage.siblings('.actionBar');
 				
 				thisImage
 					.offset({
@@ -1664,11 +1671,11 @@ var resizeImageLayer = function(){
 						top: block.offset().top + ((block.height() - thisImage.height()) / 2)
 					});
 				
-				closeButton
+				imgLayerActionBar
 					.offset({
-						left: thisImage.offset().left + thisImage.width() - closeButton.outerWidth(false),
-						top: thisImage.offset().top - closeButton.outerHeight(false)
-					})
+						left: thisImage.offset().left + thisImage.width() - imgLayerActionBar.outerWidth(false),
+						top: thisImage.offset().top - imgLayerActionBar.outerHeight(false)
+					});
 			});
 };
 
@@ -1676,14 +1683,36 @@ $(window).on('resize', resizeImageLayer);
 
 var timeout = 0;
 var interval = setInterval(function(){
+	if(actionBar.length > 0){
+		actionBar.offset({
+			left: animationCanvas.offset().left + ((animationCanvas.width() - actionBar.outerWidth(false)) / 2),
+			top: animationCanvas.offset().top + animationCanvas.height()
+		})
+	}
+	
 	if(animationCanvas.length == 1 && animationCanvas.closest('body').length == 0){
-		button.hide();
+		createButton.hide();
+		downloadButton.hide();
+		//downloadGIFButton.hide();
+		downloadGIFButton.css('display', 'none');
 		
 		reset();
+		
+		pixivUgoiraGIF();
 	}
 }, 100);
 
+var buttonStyle = {
+	border: '1px solid #CFCFCF',
+	borderRadius: '5px',
+	padding: '3px 7px',
+	background: '#FFF',
+	cursor: 'pointer'
+};
+
 var pixivUgoiraGIF = function(){
+	//console.log('Searching for canvas...');
+	
 	animationCanvas = $('canvas').filter('[data-ugoira]');
 	
 	if(animationCanvas.length == 0){
@@ -1701,30 +1730,28 @@ var pixivUgoiraGIF = function(){
 	}	
 	
 	if(animationCanvas.length == 1 && ! $.isEmptyObject(ugoiraData)){
-		frames = ugoiraData.frames;
-		
-		if(button.length == 0){
-			button = $('<button>');
-			button
-				.appendTo('body')
+		if(actionBar.length == 0){
+			actionBar = $('<div>')
 				.css({
 					position: 'absolute',
-					border: '1px solid #CFCFCF',
-					borderRadius: '5px',
-					padding: '3px 7px',
-					backgroundColor: '#FFF',
 					zIndex: 10000
-				});
-		}else{
-			button.show();
+				})
+				.appendTo('body');
 		}
 		
-		button
+		frames = ugoiraData.frames;
+		
+		if(createButton.length == 0){
+			createButton = $('<button class="createButton">');
+			createButton
+				.appendTo(actionBar)
+				.css(buttonStyle);
+		}else{
+			createButton.show();
+		}
+		
+		createButton
 			.text('Loading frames...')
-			.offset({
-				left: animationCanvas.offset().left + ((animationCanvas.width() - button.outerWidth(false)) / 2),
-				top: animationCanvas.offset().top + animationCanvas.height()
-			})
 			.prop('disabled', true)
 			.off('click')
 			.on('click', function(){
@@ -1743,6 +1770,54 @@ var pixivUgoiraGIF = function(){
 				
 				return false;
 			});
+		
+		if(downloadGIFButton.length == 0){
+			downloadGIFButton = $('<a>Download GIF!</a>');
+			downloadGIFButton
+				.css(buttonStyle)
+				.css('display', 'none')
+				.on({
+					click: function(){
+						var thisButton = $(this);
+						
+						thisButton.attr({
+							download: fileName,
+							href: dataURL
+						});
+						
+						setTimeout(function(){
+							thisButton
+								.removeAttr('download')
+								.removeAttr('href');
+						}, 100);
+					}
+				})
+				//.hide()
+				.appendTo(actionBar);
+		}
+		
+		if(downloadButton.length == 0){
+			downloadButton = $('<button class="downloadButton">');
+			downloadButton
+				.appendTo(actionBar)
+				.css(buttonStyle);
+		}else{
+			downloadButton.show();
+		}
+		
+		downloadButton
+			.text('Download ZIP!')
+			.off('click')
+			.on('click', function(){
+				window.open(ugoiraData.src);
+				
+				return false;
+			});
+		
+		/*actionBar.offset({
+			left: animationCanvas.offset().left + ((animationCanvas.width() - actionBar.outerWidth(false)) / 2),
+			top: animationCanvas.offset().top + animationCanvas.height()
+		});*/
 	
 		encoder.setRepeat(0);
 		
@@ -1761,7 +1836,7 @@ var pixivUgoiraGIF = function(){
 	            			framesReady = true;
 	            		}
 	            	}else{
-	            		button   
+	            		createButton   
 		            		.text('Create GIF!')
 		            		.prop('disabled', false);
 	            	}
@@ -1786,25 +1861,25 @@ var pixivUgoiraGIF = function(){
             				position: 'absolute'
             			})
 	            		.appendTo(block);
-
-	            	$('<button>Close</button>')
+	            	
+	            	var imgLayerActionBar = $('<div class="actionBar">')
 	            		.css({
-	            			position: 'absolute',
-	        				border: '1px solid #CFCFCF',
-	        				borderRadius: '5px',
-	        				padding: '3px 7px',
-	            			backgroundColor: '#FFF'
+	            			position: 'absolute'
 	            		})
+	            		.appendTo(block);
+	            	
+	            	$('<button class="closeButton">Close</button>')
+	            		.css(buttonStyle)
 	            		.on('click', function(){
 	            			block.remove();
 	            		})
-	            		.appendTo(block);
+	            		.appendTo(imgLayerActionBar);
 	            	
 	            	resizeImageLayer();
         		}
 	            
 	            if (!n) return this._debugLog("Image not available!"), void this._setLoadingState(0);
-	            2 != this._loadingState && this._setLoadingState(1), this.op.autosize && (this._context.canvas.width != n.width || this._context.canvas.height != n.height) && (this._context.canvas.width = n.width, this._context.canvas.height = n.height), this._context.clearRect(0, 0, this.op.canvas.width, this.op.canvas.height), this._context.drawImage(n, 0, 0), (framesReady && !encodingDone && encodingStart) ? encoder.setDelay(ugoiraData.frames[this._frame].delay):'', (framesReady && !encodingDone && encodingStart) ? encoder.addFrame(this._context):'', (framesReady && !encodingDone && encodingStart) ? button.text(button.data('initial-text') + ' [Frame ' + (this._frame + 1) + ' of ' + frames.length + ']'):'', $(this).triggerHandler("frame", this._frame), this._paused || (this._timer = setTimeout(function() {
+	            2 != this._loadingState && this._setLoadingState(1), this.op.autosize && (this._context.canvas.width != n.width || this._context.canvas.height != n.height) && (this._context.canvas.width = n.width, this._context.canvas.height = n.height), this._context.clearRect(0, 0, this.op.canvas.width, this.op.canvas.height), this._context.drawImage(n, 0, 0), (framesReady && !encodingDone && encodingStart) ? encoder.setDelay(ugoiraData.frames[this._frame].delay):'', (framesReady && !encodingDone && encodingStart) ? encoder.addFrame(this._context):'', (framesReady && !encodingDone && encodingStart) ? createButton.text(createButton.data('initial-text') + ' [Frame ' + (this._frame + 1) + ' of ' + frames.length + ']'):'', $(this).triggerHandler("frame", this._frame), this._paused || (this._timer = setTimeout(function() {
 	                t._timer = null, t._nextFrame.apply(t)
 	            }, e.delay))
 	            
@@ -1813,12 +1888,18 @@ var pixivUgoiraGIF = function(){
 		            	encodingDone = true;
 		            	encoder.finish();
 		            	
+		            	var srcArray = ugoiraData.src. split('/');
+		            	fileName = srcArray[srcArray.length - 1].replace('.zip', '.gif');
+		            	
 		            	dataURL = 'data:application/octet-stream;base64,'+encode64(encoder.stream().getData());
+
+		            	//downloadGIFButton.show();
+		            	downloadGIFButton.css('display', 'inline');
 		            	
 		            	var self = this;
 		            	
-		            	button
-		        			.text('Create GIF!')
+		            	createButton
+		        			.text('View GIF!')
 		        			.prop('disabled', false)
 		        			.off('click')
 		        			.on('click', function(){
@@ -1826,15 +1907,13 @@ var pixivUgoiraGIF = function(){
 		        				
 		        				return false;
 		        			});
-		            	
-		            	createImageLayer.call(self);
 		        	}
 	        	}
 	            
-	        	button.offset({
-					left: animationCanvas.offset().left + ((animationCanvas.width() - button.outerWidth(false)) / 2),
+	            /*actionBar.offset({
+					left: animationCanvas.offset().left + ((animationCanvas.width() - actionBar.outerWidth(false)) / 2),
 					top: animationCanvas.offset().top + animationCanvas.height()
-				})
+				});*/
 	        }
 	    };
 	}
@@ -1842,8 +1921,4 @@ var pixivUgoiraGIF = function(){
 
 $(document).ready(function(){
 	pixivUgoiraGIF();
-	
-	$('.thumb').on('click', function(){
-		pixivUgoiraGIF();
-	});
 });
