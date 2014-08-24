@@ -2184,8 +2184,8 @@ var addScript = function(src){
 var resizeImageLayer = function(){
 	var html = $('html');
 	var body = $('body');
-	var positionTop = body.offset().top + body.scrollTop() + html.scrollTop();
-	var positionLeft = body.offset().left + body.scrollLeft() + html.scrollLeft();
+	var positionTop = body.offset().top + /*body.scrollTop() +*/ html.scrollTop();
+	var positionLeft = body.offset().left + /*body.scrollLeft() +*/ html.scrollLeft();
 	
 	block
 		.offset({
