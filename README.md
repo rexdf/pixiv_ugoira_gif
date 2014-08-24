@@ -3,7 +3,7 @@ pixiv_ugoira_gif
 
 INTRODUCTION
 
-Creates a button which allows to generate an animated GIF or an WEB video from an ugoira animation hosted on pixiv.
+Creates a button which allows to generate an animated GIF or an WEBM video from an ugoira animation hosted on pixiv.
 
 It requires a javascript code injector like Greasemonkey for Firefox or Tampermonkey for Chrome. I haven't tested it in another browsers nor plugins/methods.
 
