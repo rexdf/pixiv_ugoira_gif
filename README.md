@@ -11,7 +11,7 @@ This library uses [jsgif](https://github.com/antimatter15/jsgif) for GIF encodin
 
 INSTALLATION
 
-All you've got to do is add the contents of "pixiv_ugoira_gif.js" to the disired javascript injector and that's it! If you use Greasemonkey/Tampermonkey, the script will only run when navigating pixiv.com or pixiv.net.
+All you've got to do is add the contents of "pixiv_ugoira_gif.js" to the javascript injector and that's it! If you use Greasemonkey/Tampermonkey, the script will only run when navigating pixiv.com or pixiv.net.
 
 USAGE
 
