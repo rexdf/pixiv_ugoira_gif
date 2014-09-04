@@ -19,7 +19,7 @@ The library adds dinamically the following controls:
 
 - Create!.- This button is shown when all frames of the animation are loaded. It processes the frames one by one without the need of server-side scripts at all.
 
--File type radio buttons.- These controls define the output file type. There are the GIF and the WEBM radio buttons. The WEBM conversion is currently fully supported only in Chrome. In Firefox, this feature is supported but it could result in slow performance or brief freezing. For other browsers, it has not been tested at all.
+- File type radio buttons.- These controls define the output file type. There are the GIF and the WEBM radio buttons. The WEBM conversion is currently fully supported only in Chrome. In Firefox, this feature is supported but it could result in slow performance or brief freezing. For other browsers, it has not been tested at all.
 
 - Download ZIP!.- This button is shown once the page is loaded. It starts the download of the ZIP package from pixiv. This package is loaded by the pixiv player for the original animation.
 
